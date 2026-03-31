@@ -56,7 +56,7 @@ You can install Postman via this website: https://www.postman.com/downloads/
     -   [x] Commit: `Implement add function in Subscriber repository.`
     -   [x] Commit: `Implement list_all function in Subscriber repository.`
     -   [x] Commit: `Implement delete function in Subscriber repository.`
-    -   [ ] Write answers of your learning module's "Reflection Publisher-1" questions in this README.
+    -   [x] Write answers of your learning module's "Reflection Publisher-1" questions in this README.
 -   **STAGE 2: Implement services and controllers**
     -   [ ] Commit: `Create Notification service struct skeleton.`
     -   [ ] Commit: `Implement subscribe function in Notification service.`
@@ -77,6 +77,22 @@ This is the place for you to write reflections:
 ### Mandatory (Publisher) Reflections
 
 #### Reflection Publisher-1
+Jawaban Reflection Publisher-1
+1. Apakah kita masih perlu interface (trait di Rust) untuk Subscriber di kasus BambangShop ini, atau cukup satu struct Model saja?
+
+    Dalam Observer pattern klasik (seperti yang dijelaskan di buku Head First Design Patterns), Subscriber didefinisikan sebagai interface agar publisher tidak perlu tahu detail implementasi dari masing-masing subscriber — cukup tahu bahwa mereka punya metode update(). Ini berguna ketika ada banyak jenis subscriber yang berbeda-beda perilakunya.
+
+    Namun dalam kasus BambangShop ini, hanya ada satu jenis Subscriber yang perilakunya seragam (menerima notifikasi via HTTP POST ke URL tertentu). Oleh karena itu, satu struct Model sudah cukup dan tidak perlu membuat trait Subscriber. Kalau ke depannya ada kebutuhan subscriber dengan perilaku berbeda (misal: subscriber via email, via SMS, dll.), barulah perlu dipertimbangkan untuk membuat trait.
+
+2. Apakah Vec (list) sudah cukup atau DashMap (map/dictionary) lebih tepat digunakan untuk menyimpan SUBSCRIBERS?
+
+    Menggunakan DashMap lebih tepat daripada Vec. Alasannya adalah bahwa id pada Product dan url pada Subscriber dimaksudkan untuk bersifat unik. Jika kita menggunakan Vec, untuk melakukan operasi pencarian (apakah subscriber dengan URL tertentu sudah ada), penghapusan, atau pembaruan, kita harus melakukan iterasi seluruh list yang kompleksitasnya O(n). DashMap memungkinkan operasi-operasi tersebut dilakukan dalam O(1) rata-rata menggunakan URL sebagai key, sehingga jauh lebih efisien dan juga langsung menjamin keunikan karena key tidak boleh duplikat.
+
+3. Apakah kita masih perlu DashMap atau bisa menggunakan Singleton pattern saja?
+
+    Keduanya sebenarnya saling melengkapi. Singleton pattern hanya memastikan bahwa hanya ada satu instance dari variabel SUBSCRIBERS di seluruh program — dan ini sudah kita terapkan melalui lazy_static!. Namun Singleton tidak menyelesaikan masalah thread-safety ketika beberapa thread mencoba membaca/menulis data secara bersamaan.
+
+    Di Rust, compiler secara ketat memastikan keamanan konkuren. Kalau kita menggunakan HashMap biasa dalam Singleton, Rust akan menolak kode kita karena HashMap tidak Sync. DashMap adalah concurrent HashMap yang thread-safe secara bawaan, sehingga bisa diakses oleh banyak thread sekaligus tanpa perlu lock manual. Jadi kita tetap butuh DashMap (atau mekanisme locking seperti Mutex<HashMap>) bahkan dengan Singleton pattern.
 
 #### Reflection Publisher-2
 
