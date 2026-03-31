@@ -63,7 +63,7 @@ You can install Postman via this website: https://www.postman.com/downloads/
     -   [x] Commit: `Implement subscribe function in Notification controller.`
     -   [x] Commit: `Implement unsubscribe function in Notification service.`
     -   [x] Commit: `Implement unsubscribe function in Notification controller.`
-    -   [ ] Write answers of your learning module's "Reflection Publisher-2" questions in this README.
+    -   [x] Write answers of your learning module's "Reflection Publisher-2" questions in this README.
 -   **STAGE 3: Implement notification mechanism**
     -   [ ] Commit: `Implement update method in Subscriber model to send notification HTTP requests.`
     -   [ ] Commit: `Implement notify function in Notification service to notify each Subscriber.`
@@ -95,5 +95,31 @@ Jawaban Reflection Publisher-1
     Di Rust, compiler secara ketat memastikan keamanan konkuren. Kalau kita menggunakan HashMap biasa dalam Singleton, Rust akan menolak kode kita karena HashMap tidak Sync. DashMap adalah concurrent HashMap yang thread-safe secara bawaan, sehingga bisa diakses oleh banyak thread sekaligus tanpa perlu lock manual. Jadi kita tetap butuh DashMap (atau mekanisme locking seperti Mutex<HashMap>) bahkan dengan Singleton pattern.
 
 #### Reflection Publisher-2
+
+1. Mengapa kita perlu memisahkan "Service" dan "Repository" dari Model?
+
+    Pemisahan ini mengikuti prinsip Single Responsibility Principle (SRP). Model seharusnya hanya bertanggung jawab merepresentasikan data/entitas domain. Jika kita mencampur logika bisnis dan akses database ke dalam Model, maka setiap perubahan pada cara data disimpan (misalnya ganti dari in-memory ke database sungguhan) akan memaksa kita mengubah Model juga, dan begitu pula sebaliknya.
+Dengan memisahkan:
+
+    Repository bertanggung jawab hanya untuk operasi akses data (CRUD ke penyimpanan).
+Service bertanggung jawab untuk logika bisnis (aturan validasi, orkestrasi antara beberapa repository, dll.).
+Model hanya merepresentasikan struktur data.
+
+    Ini membuat kode lebih mudah di-maintain, di-test secara terpisah, dan lebih mudah diubah di masa depan.
+
+2. Apa yang terjadi jika kita hanya menggunakan Model saja?
+
+    Jika hanya menggunakan Model, maka setiap Model (Product, Subscriber, Notification) harus mengetahui satu sama lain secara langsung. Misalnya, Model Product harus tahu cara mengakses data Subscriber untuk mengirim notifikasi, dan juga harus menyimpan logika bisnis terkait notifikasi. Ini menciptakan coupling yang tinggi antar model.
+Kompleksitas kode akan meningkat drastis karena:
+
+    Model Product harus berisi logika pengiriman notifikasi.
+Model Subscriber harus berisi logika penyimpanan dan pengambilan data.
+Model Notification harus tahu format pesan untuk setiap event.
+
+    Perubahan kecil di satu model bisa berdampak besar ke model lainnya, membuat kode sulit di-maintain dan di-test.
+    
+3. Apakah kamu sudah mengeksplorasi Postman? Bagaimana alat ini membantumu?
+
+    Postman sangat membantu untuk menguji endpoint API tanpa perlu menulis kode client. Fitur-fitur yang berguna antara lain: Collections untuk mengorganisir request, Environment Variables untuk menyimpan URL base agar mudah diganti ketika berpindah environment (development/production), dan fitur Send untuk langsung melihat response dari server. Untuk proyek kelompok, fitur Environments sangat berguna agar satu koleksi request bisa dipakai oleh semua anggota tim cukup dengan mengganti variabel environment saja.
 
 #### Reflection Publisher-3
