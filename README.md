@@ -69,7 +69,7 @@ You can install Postman via this website: https://www.postman.com/downloads/
     -   [x] Commit: `Implement notify function in Notification service to notify each Subscriber.`
     -   [x] Commit: `Implement publish function in Program service and Program controller.`
     -   [x] Commit: `Edit Product service methods to call notify after create/delete.`
-    -   [ ] Write answers of your learning module's "Reflection Publisher-3" questions in this README.
+    -   [x] Write answers of your learning module's "Reflection Publisher-3" questions in this README.
 
 ## Your Reflections
 This is the place for you to write reflections:
@@ -123,3 +123,35 @@ Model Notification harus tahu format pesan untuk setiap event.
     Postman sangat membantu untuk menguji endpoint API tanpa perlu menulis kode client. Fitur-fitur yang berguna antara lain: Collections untuk mengorganisir request, Environment Variables untuk menyimpan URL base agar mudah diganti ketika berpindah environment (development/production), dan fitur Send untuk langsung melihat response dari server. Untuk proyek kelompok, fitur Environments sangat berguna agar satu koleksi request bisa dipakai oleh semua anggota tim cukup dengan mengganti variabel environment saja.
 
 #### Reflection Publisher-3
+
+1. Variasi Observer Pattern mana yang digunakan dalam tutorial ini?
+
+    Dalam tutorial ini, saya menggunakan variasi Push model pada Observer Pattern. Pada model ini, setiap kali terjadi suatu event (seperti pembuatan, penghapusan, atau promosi produk), publisher secara aktif mengirimkan (push) notifikasi kepada seluruh subscriber.
+
+    Notifikasi tersebut dikirim melalui HTTP POST request yang sudah berisi seluruh informasi yang dibutuhkan oleh subscriber, sehingga subscriber tidak perlu lagi meminta data tambahan ke publisher.
+
+2. Apa keuntungan dan kekurangan jika menggunakan variasi Pull model?
+
+    Apabila menggunakan Pull model, maka subscriber yang akan secara aktif meminta data ke publisher.
+
+    Keuntungan:
+
+    Subscriber memiliki fleksibilitas untuk menentukan kapan dan data apa yang ingin diambil.
+    Publisher tidak perlu menyesuaikan format data untuk masing-masing subscriber.
+    Subscriber hanya mengambil data yang benar-benar dibutuhkan.
+
+    Kekurangan:
+
+    Subscriber harus melakukan polling secara berkala, yang dapat mengakibatkan pemborosan resource jika dilakukan terlalu sering.
+    Notifikasi tidak bersifat real-time karena bergantung pada interval polling.
+    Kompleksitas sistem meningkat di sisi subscriber karena harus mengelola mekanisme polling.
+
+3. Apa yang terjadi jika kita tidak menggunakan multi-threading dalam proses notifikasi?
+
+    Jika tidak menggunakan multi-threading, pengiriman notifikasi ke semua subscriber akan dilakukan secara sekuensial (satu per satu). Ini berarti:
+
+    Jika ada banyak subscriber, atau salah satu subscriber lambat merespons (timeout lama), maka request pembuatan/penghapusan produk akan menunggu sampai semua notifikasi terkirim baru bisa mengembalikan response ke pengguna.
+Hal ini akan membuat performa aplikasi sangat lambat dan pengalaman pengguna menjadi buruk.
+Dalam kasus terburuk, jika salah satu subscriber tidak bisa diakses dan timeout-nya lama, seluruh proses akan terhenti selama waktu tersebut.
+
+    Dengan multi-threading, setiap notifikasi dikirim di thread terpisah secara paralel, sehingga aplikasi main bisa langsung merespons pengguna tanpa menunggu semua notifikasi selesai terkirim.
